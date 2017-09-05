@@ -12,9 +12,18 @@
 image_transport::Publisher pub;
 image_transport::Subscriber sub;
 
+float cam_matrix[3][3] = {395.783368, 0.000000, 313.447786,
+                          0.000000, 394.853999, 234.630208,
+                          0.000000, 0.000000, 1.000000};
+float cam_distCoeffs[5] = {-0.301481 ,0.090235 ,0.001509 ,-0.002485 ,0.000000};
+
+cv::Mat camera_matrix(3, 3, CV_32F, cam_matrix);
+cv::Mat camera_distCoeffs(5, 1, CV_32F, cam_distCoeffs);
+
 void imageCallback(const sensor_msgs::ImageConstPtr &tem_msg)
 {
   cv::Mat img;
+  cv::Mat output;
   double fps = 1;
   ros::Time begin = ros::Time::now();
   static ros::Time next;
@@ -25,10 +34,16 @@ void imageCallback(const sensor_msgs::ImageConstPtr &tem_msg)
   try
   {
     img = cv_bridge::toCvShare(tem_msg, "mono8")->image;
-    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", img).toImageMsg();
+    //fisheye::initUndistortRectifyMap
+    // std::cout<<"cam_matrix"<<camera_matrix<<"dis_off" << camera_distCoeffs<<std::endl;
+
+    cv::undistort(img, output, camera_matrix, camera_distCoeffs);
+    //sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", img).toImageMsg();
+    sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", output).toImageMsg();
     pub.publish(msg);
     //img = cv_bridge::toCvShare(tem_msg, "bgr8")->image;
-    cv::imshow("call_view", img);
+    // cv::imshow("call_view", img);
+    cv::imshow("call_view", output);
   }
   catch (cv_bridge::Exception &e)
   {
