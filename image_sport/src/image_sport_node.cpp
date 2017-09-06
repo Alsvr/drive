@@ -15,7 +15,7 @@ image_transport::Subscriber sub;
 float cam_matrix[3][3] = {395.783368, 0.000000, 313.447786,
                           0.000000, 394.853999, 234.630208,
                           0.000000, 0.000000, 1.000000};
-float cam_distCoeffs[5] = {-0.301481 ,0.090235 ,0.001509 ,-0.002485 ,0.000000};
+float cam_distCoeffs[5] = {-0.301481, 0.090235, 0.001509, -0.002485, 0.000000};
 
 cv::Mat camera_matrix(3, 3, CV_32F, cam_matrix);
 cv::Mat camera_distCoeffs(5, 1, CV_32F, cam_distCoeffs);
